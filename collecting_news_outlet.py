@@ -75,7 +75,7 @@ d.to_json('news_post.json', orient='records')'''
 
 
 ###part 2
-loaded_df = pd.read_json('news_post.json', orient='records')
+'''loaded_df = pd.read_json('news_post.json', orient='records')
 print(len(loaded_df))
 
 new_final_list = pd.read_csv("doi_news_final.csv")
@@ -108,7 +108,46 @@ new = merged.explode('author', ignore_index=True)
 new.to_csv("doi_news_name.csv", index = False)
 
 
+dd = pd.read_csv("doi_news_name.csv")
+print(len(dd))
+print(dd['doi'].nunique())'''
 
+
+###part3
+dd = pd.read_csv("doi_news_name.csv")
+print(len(dd))
+print(dd['doi'].nunique())
+dd = dd.drop(['news_cnt'], axis = 1)
+#print(dd.dtypes)
+#print(dd.head(5))
+dd = dd.rename(columns = {'author':'media'})
+
+dd['media'] = dd['media'].str.strip()
+dd['media'] = dd['media'].str.replace(r'\s+', '', regex=True)
+dd['media'] = dd['media'].str.lower()
+dd['media'] = dd['media'].str.replace(r'\.com$', '', regex=True)
+print(dd.head(5))
+print("length of doi ",len(dd))
+
+df = pd.read_excel("media_by_me.xlsx", 'combined')
+print(len(df))
+#print(df.head(10))
+df['media'] = df['media'].str.strip()
+df['media'] = df['media'].str.replace(r'\s+', '', regex=True)
+df['media'] = df['media'].str.lower()
+df['media'] = df['media'].str.replace(r'\.com$', '', regex=True)
+print(len(df))
+df = df.drop_duplicates()
+df['is_top'] = 1
+
+res = dd.merge(df, on = 'media', how = 'left')
+
+res.fillna({'is_top':0}, inplace=True)
+print(len(res))
+print(res.head(20))
+print(len(res[res['is_top'] > 0]))
+
+res.to_csv("doi_media_for_databricks.csv", index = False)
 
 
 
@@ -123,6 +162,3 @@ merged['citation_ids'] = merged['news'].apply(lambda x: extract_citid(x))
 
 merged['len_citation'] = merged['citation_ids'].apply(lambda x: len(x))'''
 
-dd = pd.read_csv("doi_news_name.csv")
-print(len(dd))
-print(dd['doi'].nunique())
