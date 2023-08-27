@@ -206,39 +206,63 @@ print(len(res))'''
 
 
 
-'''import asyncio
-from newspaper import Article
+import asyncio
+from newspaper import Article, ArticleException
 import csv
 import random
+
 
 async def fetch_article_data(session, url, min_delay=3, max_delay=10):
     delay = random.uniform(min_delay, max_delay)
     await asyncio.sleep(delay)
-    
-    # Download and process the article
-    article = Article(url, language="en")
-    article.download()
-    article.parse()
-    article.nlp()
+
+    if not isinstance(url, str) or not url.startswith(("http://", "https://")):
+        print(f"Invalid URL: {url}")
+        return None, None, None
 
     try:
-        article.download()
-        article.parse()
-        article.nlp()
-    except Exception as e:
-        print(f"Error processing article from {url}: {e}")
+
+        async with session.get(url) as response:
+            if response.status == 404:
+                print(f"404 Error for URL: {url}")
+                return None, None, None
+        
+        # Download and process the article
+            article = Article(url, language="en")
+            article.download()
+            article.parse()
+            article.nlp()
+
+            try:
+                article.download()
+                article.parse()
+                article.nlp()
+            except Exception as e:
+                print(f"Error processing article from {url}: {e}")
+                return None, None, None
+            
+            return article.title, article.text, article.keywords
+        
+    except ArticleException as e:
+        print(f"Article download error for URL {url}: {e}")
         return None, None, None
-    
-    return article.title, article.text, article.keywords
 
 async def main():
-    data = pd.read_csv("url_doi_list_len1.csv")
-    data = data.head(3)
+    n = 8+34 ##done with 8 + 34, last saved in newstext_2, Aug 26
+    res = pd.read_csv("url_doi_list_len1.csv")
+    '''res = res.head(n)
+    
+    data = res.drop_duplicates(subset=['media'],keep = 'first', ignore_index = True)'''
+
+    data = res.tail(res.shape[0]-n)
+    data = data.head(1500)
 
     doi = data['doi']
     media = data['media']
     urls = data['url']
-    output_file = "newstext_1.csv"
+    output_file = "newstext_2.csv"
+
+    dic = {}
     
     async with aiohttp.ClientSession() as session:
         with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
@@ -246,8 +270,13 @@ async def main():
             csv_writer.writerow(["URL", "Title", "Text", "Keywords", 'doi','media'])  # Write header
             cnt = 1
             for url,d,med in zip(urls,doi,media):
+                if med in dic:
+                    print(med," is already done")
+                    continue
                 title, text, keywords = await fetch_article_data(session, url)
-                csv_writer.writerow([url, title, text, keywords,d,med])
+                if text is not None:
+                    csv_writer.writerow([url, title, text, keywords,d,med])
+                    dic[med] = 1
                 #print(f"Processed: {url}")
                 print(cnt)
                 cnt += 1
@@ -258,4 +287,4 @@ async def main():
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())'''
+    loop.run_until_complete(main())
