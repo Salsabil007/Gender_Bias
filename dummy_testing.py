@@ -248,19 +248,23 @@ async def fetch_article_data(session, url, min_delay=3, max_delay=10):
         return None, None, None
 
 async def main():
-    n = 8+34 ##done with 8 + 34, last saved in newstext_2, Aug 26
+    n = 8+34+76+13 + 4 + 47 ##done with 8 + 34+76+13 + 4 + 47, last saved in newstext_4, merged it with newstext_3 and saved in newstext_3. 
+    #Aug 28. create new uncalled_links2.csv file, merged it with uncalled_links1.csv and saved it in uncalled_links1.csv. Aug 29.
     res = pd.read_csv("url_doi_list_len1.csv")
-    '''res = res.head(n)
     
-    data = res.drop_duplicates(subset=['media'],keep = 'first', ignore_index = True)'''
+    #res = res.head(n)
+    #data = res.drop_duplicates(subset=['media'],keep = 'first', ignore_index = True)
 
     data = res.tail(res.shape[0]-n)
-    data = data.head(1500)
+    data = data.head(1000)
 
     doi = data['doi']
     media = data['media']
     urls = data['url']
-    output_file = "newstext_2.csv"
+    output_file = "newstext_4.csv"
+
+    ##save the undone ones
+    m,dd,ur = [],[],[]
 
     dic = {}
     
@@ -272,6 +276,15 @@ async def main():
             for url,d,med in zip(urls,doi,media):
                 if med in dic:
                     print(med," is already done")
+                    m.append(med)
+                    ur.append(url)
+                    dd.append(d)
+
+                    sv = pd.DataFrame()
+                    sv['media'] = m
+                    sv['doi'] = dd 
+                    sv['url'] = ur
+                    sv.to_csv("uncalled_links2.csv", index = False)
                     continue
                 title, text, keywords = await fetch_article_data(session, url)
                 if text is not None:
@@ -288,3 +301,16 @@ async def main():
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
+
+
+'''d1 = pd.read_csv("newstext_4.csv")
+d2 = pd.read_csv("newstext_3.csv")
+
+d2 = pd.concat([d2, d1], ignore_index=True)
+d2.to_csv("newstext_3.csv")'''
+
+'''d1 = pd.read_csv("uncalled_links2.csv")
+d2 = pd.read_csv("uncalled_links1.csv")
+
+d2 = pd.concat([d2, d1], ignore_index=True)
+d2.to_csv("uncalled_links1.csv")'''
