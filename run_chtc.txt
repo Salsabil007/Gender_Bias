@@ -1,0 +1,16 @@
+run this command with cd = the folder where is anaconda3
+source anaconda3/bin/activate
+
+conda activate gender_env
+
+For LUCI:
+conda create --name LUCI_env python=3.5 -y
+
+conda env remove --name LUCI_env
+
+
+
+for bert_uncertainty: https://github.com/PeterZhizhin/BERTUncertaintyDetection
+(folder) - BERT_uncertainty
+conda create --name bertuncertainty_env python=3.6 -y
+conda activate bertuncertainty_env
