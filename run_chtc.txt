@@ -1,3 +1,10 @@
+connect to chtc:
+ssh arabi2@submit2.chtc.wisc.edu  
+
+new:
+ssh arabi2@ap2002.chtc.wisc.edu
+
+
 run this command with cd = the folder where is anaconda3
 source anaconda3/bin/activate
 
@@ -14,3 +21,37 @@ for bert_uncertainty: https://github.com/PeterZhizhin/BERTUncertaintyDetection
 (folder) - BERT_uncertainty
 conda create --name bertuncertainty_env python=3.6 -y
 conda activate bertuncertainty_env
+
+
+scp arabi2@submit2.chtc.wisc.edu:/home/arabi2/Salsabil/Gender_Bias/LUCI/uncertainty/pred.csv ~/Documents/PhD
+
+scp i run_luci.py arabi2@submit2.chtc.wisc.edu:/home/arabi2/Salsabil/Gender_Bias/LUCI/uncertainty/
+
+
+
+run uncertainty by Jiaxin: folder -> jiaxin_uncertainty
+conda create --name jiaxin_uncertainty python=3.6 -y
+pip3 install certainty-estimator
+pip3 install torch>=1.6.0
+pip3 install transformers>=3.1.0
+
+
+crypten
+conda create --name crypten_env python=3.7 -y
+!pip install torch>=1.7.0 torchvision>=0.9.1 omegaconf>=2.0.6 onnx>=1.7.0 pandas>=1.2.2 pyyaml>=5.3.1 tensorboard future scipy>=1.6.0
+
+!pip install --no-deps crypten
+
+
+pip install antlr4-python3-runtime==4.9
+pip install numpy
+pip3 install torch>=1.7.0
+pip3 install protobuf
+pip3 install google-cloud-translate
+
+
+##create requirements:
+pip list --format=freeze > requirements.txt
+
+##for conda
+conda list -e > requirements.txt
